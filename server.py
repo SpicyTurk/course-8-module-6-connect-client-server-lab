@@ -1,11 +1,36 @@
 from flask import Flask, jsonify, request
-from flask_cors import CORS
+# from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)
+# CORS(app)
 
 # Create a list called 'events' with a couple of sample event dictionaries
 # Each dictionary should have an 'id' and a 'title'
+events = [
+    {"id": 1, "title": "Yoga in the Park"},
+    {"id": 2, "title": "Lake 5K Run"},
+    {"id": 3, "title": "Book Club"}
+]
+
+@app.route("/", methods=["GET"])
+def welcome():
+    return jsonify({"message": "Welcome to the events page!"}), 200
+
+@app.route("/events", methods=["GET"])
+def get_events():
+    return jsonify(events), 200
+
+@app.route("/events", methods=["POST"])
+def add_event():
+    try:
+        data = request.get_json()
+        new_id = max((e["id"] for e in events), default=0) + 1
+        new_event = {"id": new_id, "title": data["title"]}
+        events.append(new_event)
+        return jsonify(new_event), 201
+    except:
+        return jsonify({"message": "Enter a valid event title"}), 400
+
 
 # TASK: Create a route for "/"
 # This route should return a JSON welcome message
